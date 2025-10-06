@@ -278,7 +278,7 @@ export const AdminPanel: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Panel de Administración</h1>
               <p className="mt-1 text-sm text-gray-500">
-                Gestiona tu tienda online LC Imports
+                Gestiona la repuestera Repuestos Mendez
               </p>
             </div>
             <div className="flex items-center space-x-4">
