@@ -39,10 +39,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <img
             src={currentImage}
             alt={product.name}
-            className="w-full h-48 object-cover"
+            className="w-full h-40 md:h-44 object-cover"
           />
         ) : (
-          <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+          <div className="w-full h-40 md:h-44 bg-gray-200 flex items-center justify-center">
             <Package className="h-16 w-16 text-gray-400" />
           </div>
         )}

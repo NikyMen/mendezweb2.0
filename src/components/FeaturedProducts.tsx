@@ -147,12 +147,12 @@ export const FeaturedProducts: React.FC = () => {
               {featuredProducts.map((product) => (
                 <div key={product.id} className="w-full flex-shrink-0">
                   <div className="bg-white overflow-hidden">
-                    <div className="md:flex min-h-[500px]">
-                      <div className="md:w-1/2 relative">
+                    <div className="md:flex min-h-[250px]">
+                      <div className="md:w-1/2 relative h-[200px] md:h-[250px] overflow-hidden flex items-center justify-center bg-white">
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="w-full h-64 md:h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                         <div className="absolute top-4 left-4">
                           <span className="inline-flex items-center bg-yellow-400 text-yellow-900 text-sm font-semibold px-3 py-1 rounded-full shadow-lg">
