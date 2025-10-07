@@ -38,7 +38,8 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const uploadDir = join(process.cwd(), 'public', 'uploads');
+    const isVercel = !!process.env.VERCEL;
+    const uploadDir = isVercel ? join('/tmp', 'uploads') : join(process.cwd(), 'public', 'uploads');
     
     // Crear directorio si no existe
     if (!existsSync(uploadDir)) {
@@ -77,10 +78,10 @@ export const POST: APIRoute = async ({ request }) => {
       const filePath = join(uploadDir, fileName);
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      
       await writeFile(filePath, buffer);
       
-      uploadedFiles.push(`/uploads/${fileName}`);
+      const publicUrl = isVercel ? `/api/uploads/${fileName}` : `/uploads/${fileName}`;
+      uploadedFiles.push(publicUrl);
     }
 
     // Para compatibilidad con código que espera un solo archivo
