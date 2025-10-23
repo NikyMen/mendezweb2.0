@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
+// Eliminamos dependencias nativas para evitar errores en Vercel
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -38,14 +39,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const isVercel = !!process.env.VERCEL;
-    const uploadDir = isVercel ? join('/tmp', 'uploads') : join(process.cwd(), 'public', 'uploads');
-    
-    // Crear directorio si no existe
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
+    // No guardar en disco. Devolver data URLs en base64 para almacenar en DB
     const uploadedFiles: string[] = [];
 
     for (const file of files) {
@@ -59,9 +53,9 @@ export const POST: APIRoute = async ({ request }) => {
         });
       }
 
-      // Validar tamaño (máximo 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        return new Response(JSON.stringify({ error: 'El archivo es demasiado grande. Máximo 5MB' }), {
+      // Validar tamaño (máximo 50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        return new Response(JSON.stringify({ error: 'El archivo es demasiado grande. Máximo 50MB' }), {
           status: 400,
           headers: {
             'Content-Type': 'application/json',
@@ -69,19 +63,22 @@ export const POST: APIRoute = async ({ request }) => {
         });
       }
 
-      // Generar nombre único para el archivo
-      const timestamp = Date.now();
-      const randomString = Math.random().toString(36).substring(2, 15);
-      const extension = file.name.split('.').pop();
-      const fileName = `product_${timestamp}_${randomString}.${extension}`;
-      
-      const filePath = join(uploadDir, fileName);
+      // Exigir WebP para mantener consistencia con el cliente
+      if (file.type.toLowerCase() !== 'image/webp') {
+        return new Response(JSON.stringify({ error: 'La imagen debe estar en formato WebP' }), {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+
+      // Convertir a base64 y devolver como data URL
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      await writeFile(filePath, buffer);
-      
-      const publicUrl = isVercel ? `/api/uploads/${fileName}` : `/uploads/${fileName}`;
-      uploadedFiles.push(publicUrl);
+      const base64 = buffer.toString('base64');
+      const dataUrl = `data:image/webp;base64,${base64}`;
+      uploadedFiles.push(dataUrl);
     }
 
     // Para compatibilidad con código que espera un solo archivo

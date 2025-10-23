@@ -3,7 +3,7 @@ export const WHATSAPP_CONFIG = {
   // Número de WhatsApp de Argentina
   // Formato: código de país + número (sin espacios, guiones o símbolos)
   // Argentina: +54 9 3794 4065 09 = 5493794406509
-  phoneNumber: '5493795040807',
+  phoneNumber: '5493794789660',
   
   // Mensaje de bienvenida personalizable
   welcomeMessage: '¡Hola! Me interesa consultar sobre estos productos:',

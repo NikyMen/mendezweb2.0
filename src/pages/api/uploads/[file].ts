@@ -12,8 +12,28 @@ export const GET: APIRoute = async ({ params }) => {
       });
     }
 
-    const filePath = join('/tmp', 'uploads', filename);
-    const data = await readFile(filePath);
+    // Intentar leer desde /tmp/uploads (Vercel) y luego desde public/uploads (desarrollo)
+    const candidates = [
+      join('/tmp', 'uploads', filename),
+      join(process.cwd(), 'public', 'uploads', filename)
+    ];
+
+    let data: Buffer | null = null;
+    for (const candidate of candidates) {
+      try {
+        data = await readFile(candidate);
+        if (data) break;
+      } catch (_) {
+        // continuar con el siguiente candidato
+      }
+    }
+
+    if (!data) {
+      return new Response(JSON.stringify({ error: 'Archivo no encontrado' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     const ext = filename.split('.').pop()?.toLowerCase();
     let contentType = 'application/octet-stream';

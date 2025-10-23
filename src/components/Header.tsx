@@ -25,7 +25,7 @@ export const Header: React.FC = () => {
               <a href="/" className="flex items-center space-x-2">
                 <img 
                   src="/logo-lcimports.svg" 
-                  alt="Repuestos Mendez Logo" 
+                  alt="Tierra del Padel Logo" 
                   className="h-10 w-auto"
                 />
               </a>
