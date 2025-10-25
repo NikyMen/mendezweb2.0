@@ -8,7 +8,7 @@ export const FeaturedProducts: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const addToCart = useCartStore((state) => state.addToCart);
+  const addItem = useCartStore((state) => state.addItem);
 
   useEffect(() => {
     fetchFeaturedProducts();
@@ -58,7 +58,7 @@ export const FeaturedProducts: React.FC = () => {
   };
 
   const handleAddToCart = (product: Product) => {
-    addToCart(product);
+    addItem(product, 1);
   };
 
   const handleMouseEnter = () => {
