@@ -177,7 +177,10 @@ export const FeaturedProducts: React.FC = () => {
                           <div className="text-left">
                             <p className="text-sm text-gray-500 mb-1">Precio especial</p>
                             <span className="text-4xl font-bold text-primary-600">
-                              ${product.price.toFixed(2)}
+                              ${Math.round(product.price).toLocaleString('es-AR', {
+                                maximumFractionDigits: 0,
+                                minimumFractionDigits: 0
+                              })}
                             </span>
                           </div>
                           <button
