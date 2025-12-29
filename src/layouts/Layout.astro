@@ -3,7 +3,7 @@ export interface Props {
   title: string;
   description?: string;
 }
-
+import Analytics from '@vercel/analytics/astro'
 const { title, description = "Tierra del Padel - Paletas, pelotas y accesorios de pádel" } = Astro.props;
 ---
 
@@ -19,6 +19,7 @@ const { title, description = "Tierra del Padel - Paletas, pelotas y accesorios d
     <title>{title}</title>
   </head>
   <body class="bg-gray-50">
+    <Analytics />
     <slot />
   </body>
 </html>
