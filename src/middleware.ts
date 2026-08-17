@@ -23,7 +23,7 @@ export function middleware(req: NextRequest) {
 
   if (!hasCookie && !isLogin) {
     const url = req.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = pathname === "/" ? "/tienda" : "/login";
     return NextResponse.redirect(url);
   }
 
