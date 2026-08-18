@@ -1,509 +1,92 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Package, BarChart3, Users, Settings, LogOut, Tag } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { BarChart3, Boxes, FolderKanban, LogOut, Menu, Package, Plus, Settings, X } from 'lucide-react';
+import { AdminLogin } from './AdminLogin';
 import { ProductForm } from './ProductForm';
 import { ProductList } from './ProductList';
 import { CategoryForm } from './CategoryForm';
 import { CategoryList } from './CategoryList';
-import { AdminLogin } from './AdminLogin';
-import { Notification } from '../Notification';
-import { useNotification } from '../../hooks/useNotification';
-import type { Product, Category } from '../../types';
+import type { Category, Product } from '../../types';
+
+type View = 'overview' | 'products' | 'categories';
 
 export const AdminPanel: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<View>('overview');
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'products' | 'categories'>('products');
-  const [showProductForm, setShowProductForm] = useState(false);
-  const [showCategoryForm, setShowCategoryForm] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
-  
-  const { notification, showSuccess, showError, hideNotification } = useNotification();
+  const [productForm, setProductForm] = useState(false);
+  const [categoryForm, setCategoryForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | undefined>();
+  const [editingCategory, setEditingCategory] = useState<Category | undefined>();
+  const [mobileMenu, setMobileMenu] = useState(false);
 
   useEffect(() => {
-    // Verificar si ya está autenticado
-    const authStatus = localStorage.getItem('admin_authenticated');
-    if (authStatus === 'true') {
-      setIsAuthenticated(true);
-      loadProducts();
-      loadCategories();
-    } else {
-      setLoading(false);
-    }
+    const logged = localStorage.getItem('admin_authenticated') === 'true';
+    setAuthenticated(logged);
+    setLoading(false);
+    if (logged) loadData();
   }, []);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadProducts();
-      loadCategories();
-    }
-  }, [isAuthenticated]);
-
-  const loadProducts = async () => {
-    try {
-      const response = await fetch('/api/products');
-      const data = await response.json();
-      setProducts(data);
-    } catch (error) {
-      console.error('Error al cargar productos:', error);
-    } finally {
-      setLoading(false);
-    }
+  const loadData = async () => {
+    const [productsResponse, categoriesResponse] = await Promise.all([fetch('/api/products'), fetch('/api/categories')]);
+    if (productsResponse.ok) setProducts(await productsResponse.json());
+    if (categoriesResponse.ok) setCategories(await categoriesResponse.json());
   };
 
-  const loadCategories = async () => {
-    try {
-      const response = await fetch('/api/categories');
-      const data = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.error('Error al cargar categorías:', error);
-    }
+  const login = async (username: string, password: string) => {
+    const response = await fetch('/api/admin-login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
+    const data = await response.json();
+    if (!data.success) return false;
+    localStorage.setItem('admin_authenticated', 'true');
+    setAuthenticated(true);
+    await loadData();
+    return true;
   };
 
-  const handleCreateProduct = async (productData: any) => {
-    try {
-      const response = await fetch('/api/products', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(productData),
-      });
+  const logout = () => { localStorage.removeItem('admin_authenticated'); setAuthenticated(false); };
+  const closeForms = () => { setProductForm(false); setCategoryForm(false); setEditingProduct(undefined); setEditingCategory(undefined); };
 
-      if (response.ok) {
-        await loadProducts();
-        setShowProductForm(false);
-        showSuccess('Producto creado exitosamente');
-      } else {
-        const error = await response.json();
-        showError(`Error: ${error.error}`);
-      }
-    } catch (error) {
-      console.error('Error al crear producto:', error);
-      showError('Error al crear el producto');
-    }
+  const saveProduct = async (data: unknown) => {
+    const editing = editingProduct;
+    await fetch(editing ? `/api/products/${editing.id}` : '/api/products', { method: editing ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    closeForms();
+    await loadData();
   };
 
-  const handleUpdateProduct = async (productData: any) => {
-    if (!editingProduct) return;
-
-    console.log('Datos a actualizar:', productData);
-    console.log('ID del producto:', editingProduct.id);
-
-    try {
-      const response = await fetch(`/api/products/${editingProduct.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(productData),
-      });
-
-      console.log('Response status:', response.status);
-      
-      if (response.ok) {
-        const updatedProduct = await response.json();
-        console.log('Producto actualizado:', updatedProduct);
-        await loadProducts();
-        setEditingProduct(null);
-        setShowProductForm(false);
-        showSuccess('Producto actualizado exitosamente');
-      } else {
-        const error = await response.json();
-        console.error('Error del servidor:', error);
-        showError(`Error: ${error.error}`);
-      }
-    } catch (error) {
-      console.error('Error al actualizar producto:', error);
-      showError('Error al actualizar el producto');
-    }
+  const deleteProduct = async (id: string) => { await fetch(`/api/products/${id}`, { method: 'DELETE' }); await loadData(); };
+  const saveCategory = async (data: unknown) => {
+    const editing = editingCategory;
+    await fetch(editing ? `/api/categories/${editing.id}` : '/api/categories', { method: editing ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+    closeForms();
+    await loadData();
   };
 
-  const handleDeleteProduct = async (productId: string) => {
-    try {
-      const response = await fetch(`/api/products/${productId}`, {
-        method: 'DELETE',
-      });
+  if (loading) return <div className="flex min-h-screen items-center justify-center text-slate-500">Cargando panel…</div>;
+  if (!authenticated) return <AdminLogin onLogin={login} />;
 
-      if (response.ok) {
-        await loadProducts();
-        showSuccess('Producto eliminado exitosamente');
-      } else {
-        const error = await response.json();
-        showError(`Error: ${error.error}`);
-      }
-    } catch (error) {
-      console.error('Error al eliminar producto:', error);
-      showError('Error al eliminar el producto');
-    }
-  };
+  const navigation = [
+    { id: 'overview' as View, label: 'Resumen', icon: BarChart3 },
+    { id: 'products' as View, label: 'Productos', icon: Package },
+    { id: 'categories' as View, label: 'Categorías', icon: FolderKanban },
+  ];
 
-  const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
-    setShowProductForm(true);
-  };
-
-  const handleViewProduct = (product: Product) => {
-    setViewingProduct(product);
-  };
-
-  const handleCloseForm = () => {
-    setShowProductForm(false);
-    setEditingProduct(null);
-  };
-
-  const handleCloseView = () => {
-    setViewingProduct(null);
-  };
-
-  // Funciones para categorías
-  const handleCreateCategory = async (categoryData: any) => {
-    try {
-      const response = await fetch('/api/categories', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(categoryData),
-      });
-
-      if (response.ok) {
-        await loadCategories();
-        setShowCategoryForm(false);
-      } else {
-        const error = await response.json();
-        alert(`Error: ${error.error}`);
-      }
-    } catch (error) {
-      console.error('Error al crear categoría:', error);
-      alert('Error al crear la categoría');
-    }
-  };
-
-  const handleUpdateCategory = async (categoryData: any) => {
-    if (!editingCategory) return;
-
-    try {
-      const response = await fetch(`/api/categories/${editingCategory.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(categoryData),
-      });
-
-      if (response.ok) {
-        await loadCategories();
-        setEditingCategory(null);
-      } else {
-        const error = await response.json();
-        alert(`Error: ${error.error}`);
-      }
-    } catch (error) {
-      console.error('Error al actualizar categoría:', error);
-      alert('Error al actualizar la categoría');
-    }
-  };
-
-  const handleEditCategory = (category: Category) => {
-    setEditingCategory(category);
-    setShowCategoryForm(true);
-  };
-
-  const handleCloseCategoryForm = () => {
-    setShowCategoryForm(false);
-    setEditingCategory(null);
-  };
-
-  const handleLogin = async (username: string, password: string): Promise<boolean> => {
-    try {
-      const response = await fetch('/api/admin-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setIsAuthenticated(true);
-        localStorage.setItem('admin_authenticated', 'true');
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error al autenticar:', error);
-      return false;
-    }
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('admin_authenticated');
-  };
-
-  const stats = {
-    totalProducts: products.length,
-    totalCategories: categories.length,
-    totalValue: products.reduce((sum, product) => sum + product.price, 0),
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando panel de administración...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <AdminLogin onLogin={handleLogin} />;
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Panel de Administración</h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Gestiona la repuestera Repuestos Mendez
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              {activeTab === 'products' ? (
-                <button
-                  onClick={() => setShowProductForm(true)}
-                  className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 flex items-center space-x-2"
-                >
-                  <Plus size={20} />
-                  <span>Nuevo Producto</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowCategoryForm(true)}
-                  className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 flex items-center space-x-2"
-                >
-                  <Plus size={20} />
-                  <span>Nueva Categoría</span>
-                </button>
-              )}
-              <button
-                onClick={handleLogout}
-                className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 flex items-center space-x-2"
-              >
-                <LogOut size={20} />
-                <span>Cerrar Sesión</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tabs */}
-        <div className="mb-8">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
-              <button
-                onClick={() => setActiveTab('products')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'products'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <Package className="h-5 w-5 inline mr-2" />
-                Productos
-              </button>
-              <button
-                onClick={() => setActiveTab('categories')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'categories'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <Tag className="h-5 w-5 inline mr-2" />
-                Categorías
-              </button>
-            </nav>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Package className="h-6 w-6 text-gray-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Productos
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      {stats.totalProducts}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Tag className="h-6 w-6 text-gray-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Categorías
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      {stats.totalCategories}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Settings className="h-6 w-6 text-gray-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Valor Total
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      ${stats.totalValue.toFixed(2)}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Content based on active tab */}
-        {activeTab === 'products' ? (
-          <ProductList
-            products={products}
-            onEdit={handleEditProduct}
-            onDelete={handleDeleteProduct}
-            onView={handleViewProduct}
-          />
-        ) : (
-          <CategoryList
-            onEdit={handleEditCategory}
-            onDelete={() => {}}
-            onCreate={() => setShowCategoryForm(true)}
-          />
-        )}
-      </div>
-
-      {/* Product Form Modal */}
-      {showProductForm && (
-        <ProductForm
-          product={editingProduct || undefined}
-          onSubmit={editingProduct ? handleUpdateProduct : handleCreateProduct}
-          onCancel={handleCloseForm}
-          categories={categories.map(cat => cat.name)}
-        />
-      )}
-
-      {/* Category Form Modal */}
-      {showCategoryForm && (
-        <CategoryForm
-          category={editingCategory || undefined}
-          onSave={editingCategory ? handleUpdateCategory : handleCreateCategory}
-          onClose={handleCloseCategoryForm}
-        />
-      )}
-
-      {/* Product View Modal */}
-      {viewingProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {viewingProduct.name}
-                </h2>
-                <button
-                  onClick={handleCloseView}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X size={24} />
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-gray-700">Descripción:</h3>
-                  <p className="text-gray-600">{viewingProduct.description}</p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold text-gray-700">Categoría:</h3>
-                  <p className="text-gray-600">{viewingProduct.category}</p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold text-gray-700">Precio:</h3>
-                  <p className="text-gray-600">${viewingProduct.price}</p>
-                </div>
-                
-                {viewingProduct.featured && (
-                  <div className="flex items-center space-x-2 text-yellow-600">
-                    <Star className="w-5 h-5 fill-current" />
-                    <span className="font-medium">Producto Destacado</span>
-                  </div>
-                )}
-                
-                {viewingProduct.image && (
-                  <div>
-                    <h3 className="font-semibold text-gray-700 mb-2">Imagen:</h3>
-                    <img
-                      src={viewingProduct.image}
-                      alt={viewingProduct.name}
-                      className="w-full max-w-md h-64 object-cover rounded-lg"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Notification */}
-      <Notification
-        message={notification.message}
-        type={notification.type}
-        isVisible={notification.isVisible}
-        onClose={hideNotification}
-      />
-    </div>
-  );
+  return <div className="min-h-screen bg-[#f8fafc] text-slate-900">
+    <aside className={`fixed inset-y-0 left-0 z-40 w-64 border-r border-slate-800 bg-slate-950 p-5 text-white transition-transform lg:translate-x-0 ${mobileMenu ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className="flex items-center justify-between"><a href="/" className="text-lg font-black">Repuestos Méndez</a><button className="lg:hidden" onClick={() => setMobileMenu(false)}><X size={20} /></button></div>
+      <p className="mt-2 text-xs font-semibold uppercase tracking-[.18em] text-slate-500">Panel de gestión</p>
+      <nav className="mt-10 space-y-2">{navigation.map(({ id, label, icon: Icon }) => <button key={id} onClick={() => { setView(id); setMobileMenu(false); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold transition ${view === id ? 'bg-amber-400 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}><Icon size={18} />{label}</button>)}</nav>
+      <div className="absolute bottom-5 left-5 right-5 space-y-2"><a href="/" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white"><Boxes size={18} />Ver tienda</a><button onClick={logout} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white"><LogOut size={18} />Cerrar sesión</button></div>
+    </aside>
+    <div className="lg:pl-64"><header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur sm:px-8"><button onClick={() => setMobileMenu(true)} className="rounded-xl p-2 hover:bg-slate-100 lg:hidden"><Menu size={20} /></button><div className="hidden text-sm text-slate-500 sm:block">Administración / <span className="font-bold text-slate-900">{navigation.find((item) => item.id === view)?.label}</span></div><div className="ml-auto flex items-center gap-2 text-sm font-semibold text-slate-500"><Settings size={17} /> Cuenta administradora</div></header>
+      <main className="mx-auto max-w-7xl p-4 sm:p-8"><div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-sm font-bold uppercase tracking-[.18em] text-amber-600">Panel básico</p><h1 className="mt-2 text-3xl font-black tracking-tight">{view === 'overview' ? 'Resumen de la tienda' : navigation.find((item) => item.id === view)?.label}</h1><p className="mt-2 text-slate-500">Gestioná el contenido que aparece en Repuestos Méndez.</p></div>{view === 'products' ? <button onClick={() => { setEditingProduct(undefined); setProductForm(true); }} className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white hover:bg-slate-800"><Plus size={18} />Nuevo producto</button> : view === 'categories' ? <button onClick={() => { setEditingCategory(undefined); setCategoryForm(true); }} className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white hover:bg-slate-800"><Plus size={18} />Nueva categoría</button> : null}</div>
+        {view === 'overview' && <><div className="grid gap-4 sm:grid-cols-3"><Stat label="Productos" value={products.length} icon={<Package />} /><Stat label="Categorías" value={categories.length} icon={<FolderKanban />} /><Stat label="Valor del catálogo" value={`$${products.reduce((sum, product) => sum + product.price, 0).toLocaleString('es-AR')}`} icon={<BarChart3 />} /></div><section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center justify-between"><h2 className="font-black">Productos recientes</h2><button onClick={() => setView('products')} className="text-sm font-bold text-amber-700">Ver todos</button></div><div className="mt-4 divide-y divide-slate-100">{products.slice(0, 5).map((product) => <div key={product.id} className="flex items-center justify-between py-3"><span className="font-semibold">{product.name}</span><span className="text-sm text-slate-500">{product.category} · ${product.price.toLocaleString('es-AR')}</span></div>)}{!products.length && <p className="py-5 text-sm text-slate-500">Todavía no hay productos cargados.</p>}</div></section></>}
+        {view === 'products' && <ProductList products={products} onEdit={(product) => { setEditingProduct(product); setProductForm(true); }} onDelete={deleteProduct} onView={() => undefined} />}
+        {view === 'categories' && <CategoryList onEdit={(category) => { setEditingCategory(category); setCategoryForm(true); }} onDelete={() => undefined} onCreate={() => setCategoryForm(true)} />}
+      </main></div>
+    {productForm && <ProductForm product={editingProduct} categories={categories.map((category) => category.name)} onSubmit={saveProduct} onCancel={closeForms} />}
+    {categoryForm && <CategoryForm category={editingCategory} onSave={saveCategory} onClose={closeForms} />}
+  </div>;
 };
+
+const Stat: React.FC<{ label: string; value: string | number; icon: React.ReactNode }> = ({ label, value, icon }) => <div className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center justify-between"><span className="text-sm font-semibold text-slate-500">{label}</span><span className="text-amber-500">{icon}</span></div><strong className="mt-4 block text-2xl font-black">{value}</strong></div>;
