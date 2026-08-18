@@ -1,32 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { Header } from '../components/Header';
-import { Hero } from '../components/Hero';
-import { FeaturedProducts } from '../components/FeaturedProducts';
-import { Features } from '../components/Features';
-import { ProductGrid } from '../components/ProductGrid';
+import { Storefront } from '../components/Storefront';
 ---
 
-<Layout title="Mendez Repuestos" description="Mendez Repuestos - Todos los repuestos para tu moto">
-  <Header client:load />
-  <Hero client:load />
-  <FeaturedProducts client:load />
-  <Features client:load />
-  <main>
-    <section id="productos" class="bg-[#f7f8fa]">
-      <div class="mx-auto max-w-7xl px-4 pt-16 sm:px-6 lg:px-8">
-        <p class="text-sm font-bold uppercase tracking-[0.2em] text-amber-600">Catálogo online</p>
-        <h2 class="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Productos destacados</h2>
-        <p class="mt-3 max-w-2xl text-slate-500">Precios y disponibilidad actualizados para que encuentres lo que necesitás.</p>
-      </div>
-      <ProductGrid client:load />
-    </section>
-  </main>
-  <footer class="border-t border-slate-200 bg-white">
-    <div class="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-      <span class="font-semibold text-slate-900">Repuestos Méndez</span>
-      <span>Catálogo online de repuestos y accesorios para tu moto.</span>
-      <a href="/admin" class="font-semibold text-slate-700 hover:text-slate-950">Panel de administración</a>
-    </div>
-  </footer>
+<Layout title="Repuestos Méndez | Tienda online" description="Repuestos Méndez - Catálogo online de repuestos para tu moto">
+  <Storefront client:load />
 </Layout>
