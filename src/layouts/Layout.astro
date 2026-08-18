@@ -3,8 +3,7 @@ export interface Props {
   title: string;
   description?: string;
 }
-import Analytics from '@vercel/analytics/astro'
-const { title, description = "Tierra del Padel - Paletas, pelotas y accesorios de pádel" } = Astro.props;
+const { title, description = "Repuestos Méndez - Repuestos y accesorios para tu moto" } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -14,12 +13,10 @@ const { title, description = "Tierra del Padel - Paletas, pelotas y accesorios d
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/logo-lcimports.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class="bg-gray-50">
-    <Analytics />
+  <body class="bg-[#f7f8fa] text-slate-900 antialiased">
     <slot />
   </body>
 </html>

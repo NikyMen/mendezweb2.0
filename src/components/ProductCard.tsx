@@ -48,11 +48,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <>
       <div 
-        className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden cursor-pointer"
+        className="cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
         onClick={openModal}
       >
         <div className="relative">
-          <div className="aspect-square w-full overflow-hidden bg-gray-100">
+          <div className="aspect-square w-full overflow-hidden bg-slate-100">
             {currentImage ? (
               <img
                 src={currentImage}
@@ -60,8 +60,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
               />
             ) : (
-              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                <Package className="h-16 w-16 text-gray-400" />
+              <div className="flex h-full w-full items-center justify-center bg-slate-100">
+                <Package className="h-16 w-16 text-slate-300" />
               </div>
             )}
           </div>
@@ -114,9 +114,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           )}
         </div>
         
-        <div className="p-4">
+        <div className="p-5">
           <div className="mb-2">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+            <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
               {product.category}
             </span>
           </div>
@@ -142,14 +142,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-2xl font-bold text-primary-600">
+              <span className="text-2xl font-bold text-slate-950">
                 {formatPriceARS(product.price)}
               </span>
             </div>
             
             <button
               onClick={handleAddToCart}
-              className="flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-colors bg-primary-600 text-white hover:bg-primary-700"
+              className="flex items-center space-x-2 rounded-xl bg-slate-950 px-4 py-2 font-semibold text-white transition-colors hover:bg-slate-800"
             >
               <ShoppingCart size={16} />
               <span>Agregar</span>

@@ -105,7 +105,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onCartUpdate }) => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Search and Filters */}
       <SearchBar
         searchQuery={searchQuery}
@@ -119,7 +119,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ onCartUpdate }) => {
 
       {/* Results Info */}
       <div className="mb-6">
-        <p className="text-gray-600">
+        <p className="text-sm text-slate-500">
           {filteredProducts.length === 0 ? (
             'No se encontraron productos'
           ) : (
