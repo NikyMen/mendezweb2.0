@@ -8,6 +8,12 @@ const COOKIE = "mendez_session";
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // Los archivos estáticos de `public/` también pasan por el middleware.
+  // Sin esta excepción, logos e imágenes de la tienda terminan en /login.
+  if (/\.(?:avif|gif|ico|jpe?g|png|svg|webp|woff2?)$/i.test(pathname)) {
+    return NextResponse.next();
+  }
+
   // Rutas públicas (sin sesión): la tienda online para clientes, sus imágenes y
   // los endpoints de MercadoPago (preferencia + webhook de confirmación).
   if (

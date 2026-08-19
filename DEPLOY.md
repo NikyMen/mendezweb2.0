@@ -2,7 +2,7 @@
 
 Esta copia vive dentro de `mendezweb2.0`, pero es una aplicación
 independiente de la app Astro del directorio raíz. Para producción se despliega
-como proyecto separado en `/opt/repuestos-mendez`.
+como proyecto separado en `/var/www/repuestos-mendez`.
 
 App Next.js 15 con WhatsApp (Baileys) embebido en el mismo proceso y base de
 datos libsql en archivo local. Por eso: **un solo proceso, fork, y tres rutas que
@@ -31,8 +31,9 @@ npm i -g pnpm pm2
 ## Primer deploy
 
 ```bash
-cd /opt/repuestos-mendez
-git clone <URL_DEL_REPO> .
+cd /var/www
+git clone https://github.com/NikyMen/mendezweb2.0.git repuestos-mendez
+cd /var/www/repuestos-mendez
 
 # Dependencias (incluye binario nativo de libsql, prebuilt para linux-x64)
 pnpm install --frozen-lockfile
@@ -58,12 +59,13 @@ pm2 save                 # guarda la lista de procesos
 pm2 startup              # imprime un comando -> ejecutalo para arrancar al bootear
 ```
 
-La app queda en `http://127.0.0.1:3300` (el puerto lo fija `ecosystem.config.cjs`).
+La app queda en `http://127.0.0.1:3301` (el puerto por defecto lo fija
+`ecosystem.config.cjs`). Para usar otro: `PORT=3302 pm2 start ecosystem.config.cjs`.
 
 ## Redeploys (cuando hacés cambios)
 
 ```bash
-cd /opt/repuestos-mendez
+cd /var/www/repuestos-mendez
 pm2 stop repuestos-mendez
 cp repuestos-mendez.db "repuestos-mendez.db.backup-$(date +%Y%m%d-%H%M%S)"
 cp .env ".env.backup-$(date +%Y%m%d-%H%M%S)"
@@ -92,7 +94,8 @@ En este VPS conviven varios sitios y **el HTTPS no lo maneja nginx**:
 |---|---|
 | 443 | **Traefik**, en el contenedor `n8n-traefik-1` |
 | 80 | nginx (solo redirige a https) |
-| 3300 | Repuestos Mendez, en el host vía PM2 |
+| 3300 | Gestoria, en el host vía PM2 |
+| 3301 | Repuestos Mendez, en el host vía PM2 |
 
 Traefik termina el TLS y emite/renueva los certificados solo, con el resolver
 `mytlschallenge` (desafío TLS-ALPN sobre el 443; no usa el puerto 80). Lee
@@ -121,7 +124,7 @@ http:
     repuestos-mendez:
       loadBalancer:
         servers:
-          - url: "http://172.18.0.1:3300"
+          - url: "http://172.18.0.1:3301"
 ```
 
 Traefik lo toma solo; no hay que reiniciar nada. Se verifica con

@@ -5,12 +5,15 @@
 // fork. Nunca uses cluster ni instances > 1: abriría varias sesiones de
 // WhatsApp peleándose por la misma conexión.
 
+const port = process.env.PORT || "3301";
+
 module.exports = {
   apps: [
     {
       name: "repuestos-mendez",
       script: "node_modules/next/dist/bin/next",
-      args: "start -p 3300",
+      // 3300 pertenece a Gestoria. Se puede sobrescribir con PORT al iniciar PM2.
+      args: `start -p ${port}`,
       cwd: __dirname,
       instances: 1, // <- una sola. No tocar.
       exec_mode: "fork", // <- fork, no cluster. No tocar.

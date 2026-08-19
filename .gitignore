@@ -1,9 +1,11 @@
 node_modules
 .next
-.env
-.env.local
+.env*
+!.env.example
 *.db
 *.db-journal
+*.db-shm
+*.db-wal
 drizzle/meta
 next-env.d.ts
 .wa-auth/
