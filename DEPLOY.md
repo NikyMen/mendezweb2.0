@@ -1,8 +1,6 @@
 # Deploy de Repuestos Mendez en el VPS (PM2)
 
-Esta copia vive dentro de `mendezweb2.0`, pero es una aplicación
-independiente de la app Astro del directorio raíz. Para producción se despliega
-como proyecto separado en `/var/www/repuestos-mendez`.
+Este proyecto se despliega en `/var/www/repuestos-mendez`.
 
 App Next.js 15 con WhatsApp (Baileys) embebido en el mismo proceso y base de
 datos libsql en archivo local. Por eso: **un solo proceso, fork, y tres rutas que
@@ -25,7 +23,9 @@ curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt-get install -y nodejs
 
 # pnpm y pm2
-npm i -g pnpm pm2
+corepack enable
+corepack prepare pnpm@9.15.9 --activate
+pnpm add --global pm2
 ```
 
 ## Primer deploy
@@ -114,7 +114,7 @@ el contenedor: `docker inspect n8n-traefik-1 --format '{{range .NetworkSettings.
 http:
   routers:
     repuestos-mendez:
-      rule: "Host(`gestoria.consultoriadigital.io`)"
+      rule: "Host(`repuestosmendez.com`) || Host(`www.repuestosmendez.com`)"
       entryPoints:
         - websecure
       service: repuestos-mendez
@@ -128,7 +128,7 @@ http:
 ```
 
 Traefik lo toma solo; no hay que reiniciar nada. Se verifica con
-`curl -sSI https://gestoria.consultoriadigital.io/login | head -3` → `HTTP/2 200`.
+`curl -sSI https://repuestosmendez.com/login | head -3` → `HTTP/2 200`.
 
 ### nginx: solo el redirect del puerto 80
 
@@ -137,7 +137,7 @@ Traefik lo toma solo; no hay que reiniciar nada. Se verifica con
 ```nginx
 server {
     listen 80;
-    server_name gestoria.consultoriadigital.io;
+    server_name repuestosmendez.com www.repuestosmendez.com;
     return 301 https://$host$request_uri;
 }
 ```
