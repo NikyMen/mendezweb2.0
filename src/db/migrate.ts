@@ -288,7 +288,7 @@ async function migrate() {
     });
   }
 
-  console.log("Esquema listo (gestoria.db).");
+  console.log("Esquema listo (repuestos-mendez.db).");
 }
 
 migrate();

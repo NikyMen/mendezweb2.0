@@ -1,8 +1,8 @@
-# Deploy de GestorIA en el VPS (PM2)
+# Deploy de Repuestos Mendez en el VPS (PM2)
 
-Esta copia vive dentro de `mendezweb2.0/gestoria`, pero es una aplicación
+Esta copia vive dentro de `mendezweb2.0`, pero es una aplicación
 independiente de la app Astro del directorio raíz. Para producción se despliega
-como proyecto separado en `/opt/gestoria`.
+como proyecto separado en `/opt/repuestos-mendez`.
 
 App Next.js 15 con WhatsApp (Baileys) embebido en el mismo proceso y base de
 datos libsql en archivo local. Por eso: **un solo proceso, fork, y tres rutas que
@@ -10,7 +10,7 @@ deben persistir**:
 
 | Ruta | Qué guarda |
 |---|---|
-| `gestoria.db` | La base entera |
+| `repuestos-mendez.db` | La base entera |
 | `.wa-auth/` | La sesión de WhatsApp (si no, hay que reescanear el QR) |
 | `uploads/` | Las fotos de los remitos de Compras |
 
@@ -31,7 +31,7 @@ npm i -g pnpm pm2
 ## Primer deploy
 
 ```bash
-cd /opt/gestoria
+cd /opt/repuestos-mendez
 git clone <URL_DEL_REPO> .
 
 # Dependencias (incluye binario nativo de libsql, prebuilt para linux-x64)
@@ -44,7 +44,7 @@ nano .env
 # En producción, el bloque de IA debe contener:
 # DEEPSEEK_API_KEY=tu_clave_deepseek
 # DEEPSEEK_MODEL=deepseek-v4-flash
-# No hace falta instalar otro SDK ni configurar MongoDB/PostgreSQL para GestorIA.
+# No hace falta instalar otro SDK ni configurar MongoDB/PostgreSQL para Repuestos Mendez.
 
 # Crear el schema y sembrar datos iniciales (usuarios, etapas, etc.)
 pnpm db:setup
@@ -63,15 +63,15 @@ La app queda en `http://127.0.0.1:3300` (el puerto lo fija `ecosystem.config.cjs
 ## Redeploys (cuando hacés cambios)
 
 ```bash
-cd /opt/gestoria
-pm2 stop gestoria
-cp gestoria.db "gestoria.db.backup-$(date +%Y%m%d-%H%M%S)"
+cd /opt/repuestos-mendez
+pm2 stop repuestos-mendez
+cp repuestos-mendez.db "repuestos-mendez.db.backup-$(date +%Y%m%d-%H%M%S)"
 cp .env ".env.backup-$(date +%Y%m%d-%H%M%S)"
 git pull
 pnpm install --frozen-lockfile
 pnpm db:push        # solo si cambió el schema (es idempotente: no rompe nada)
 pnpm build
-pm2 start ecosystem.config.cjs --only gestoria
+pm2 start ecosystem.config.cjs --only repuestos-mendez
 ```
 
 > `db:push` solo crea lo que falta (`CREATE TABLE IF NOT EXISTS` + `ALTER`
@@ -92,7 +92,7 @@ En este VPS conviven varios sitios y **el HTTPS no lo maneja nginx**:
 |---|---|
 | 443 | **Traefik**, en el contenedor `n8n-traefik-1` |
 | 80 | nginx (solo redirige a https) |
-| 3300 | GestorIA, en el host vía PM2 |
+| 3300 | Repuestos Mendez, en el host vía PM2 |
 
 Traefik termina el TLS y emite/renueva los certificados solo, con el resolver
 `mytlschallenge` (desafío TLS-ALPN sobre el 443; no usa el puerto 80). Lee
@@ -104,21 +104,21 @@ nginx que nunca va a poder tomar (el puerto es de Traefik), lo que hace fallar e
 
 ### Publicar el sitio en Traefik
 
-`/docker/n8n/dynamic/gestoria.yml` (el `172.18.0.1` es la IP del host vista desde
+`/docker/n8n/dynamic/repuestos-mendez.yml` (el `172.18.0.1` es la IP del host vista desde
 el contenedor: `docker inspect n8n-traefik-1 --format '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}'`):
 
 ```yaml
 http:
   routers:
-    gestoria:
+    repuestos-mendez:
       rule: "Host(`gestoria.consultoriadigital.io`)"
       entryPoints:
         - websecure
-      service: gestoria
+      service: repuestos-mendez
       tls:
         certResolver: mytlschallenge
   services:
-    gestoria:
+    repuestos-mendez:
       loadBalancer:
         servers:
           - url: "http://172.18.0.1:3300"
@@ -129,7 +129,7 @@ Traefik lo toma solo; no hay que reiniciar nada. Se verifica con
 
 ### nginx: solo el redirect del puerto 80
 
-`/etc/nginx/sites-available/gestoria`:
+`/etc/nginx/sites-available/repuestos-mendez`:
 
 ```nginx
 server {
@@ -152,10 +152,10 @@ El proxy de Traefik hoy no fija `client_max_body_size` ni desactiva el buffering
 ## Comandos útiles de PM2
 
 ```bash
-pm2 logs gestoria        # ver logs (incluye [whatsapp] conectado, mensajes, etc.)
+pm2 logs repuestos-mendez        # ver logs (incluye [whatsapp] conectado, mensajes, etc.)
 pm2 status
-pm2 reload gestoria      # reinicio sin downtime tras un build
-pm2 restart gestoria
+pm2 reload repuestos-mendez      # reinicio sin downtime tras un build
+pm2 restart repuestos-mendez
 ```
 
 ## Por qué NO cluster / NO varias instancias

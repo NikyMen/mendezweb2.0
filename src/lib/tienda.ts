@@ -92,5 +92,5 @@ export function tiendaToStoreProduct(product: TiendaProducto): Product {
 }
 
 export function tiendaToSuperOferta(product: TiendaProducto): SuperOferta {
-  return { id: `tienda-${product.id}`, title: product.name, subtitle: product.description || "Oferta publicada desde GestorIA", price: product.price, oldPrice: product.oldPrice, image: product.image || "/brand/logo-cd.webp", cartProductId: product.id, cartQuantity: 1, link: "/ofertas", active: true };
+  return { id: `tienda-${product.id}`, title: product.name, subtitle: product.description || "Oferta de Repuestos Mendez", price: product.price, oldPrice: product.oldPrice, image: product.image || "/logo-lcimports.svg", cartProductId: product.id, cartQuantity: 1, link: "/ofertas", active: true };
 }

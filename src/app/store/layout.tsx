@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tienda online",
+  title: "Tienda online · Repuestos Mendez",
   description: "Comprá online y pagá con MercadoPago.",
 };
 
@@ -13,10 +13,9 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-4">
-          <Link href="/store" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/logo-cd.webp" alt="" className="h-9 w-auto rounded-lg" />
-            <span className="font-display text-lg font-bold text-navy">Tienda online</span>
+          <Link href="/store" className="flex flex-col leading-tight">
+            <span className="font-display text-lg font-bold uppercase text-navy">Repuestos Mendez</span>
+            <span className="text-[11px] text-slate-500">Hecho por Nicolas Mendez</span>
           </Link>
         </div>
       </header>

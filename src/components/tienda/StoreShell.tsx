@@ -53,7 +53,7 @@ function TiendaHeader() {
         </button>
         <Link href="/" className="flex min-w-0 items-center gap-2">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-red text-lg font-black text-white">G</span>
-          <span className="truncate text-base font-extrabold uppercase tracking-tight md:text-lg">Tienda GestorIA</span>
+          <span className="truncate text-base font-extrabold uppercase tracking-tight md:text-lg">Repuestos Mendez</span>
         </Link>
         <nav className="ml-auto hidden items-center gap-5 text-sm font-semibold md:flex">
         <Link href="/" className="hover:text-brand-red">Inicio</Link>
@@ -256,7 +256,7 @@ function TiendaAssistant() {
 }
 
 function TiendaFooter() {
-  return <footer className="hidden border-t border-black/10 bg-brand-ink px-6 py-10 text-sm text-white/75 md:block"><div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3"><div><p className="text-lg font-extrabold text-white">Tienda GestorIA</p><p className="mt-2 max-w-xs">Productos publicados desde tu stock real, con pago online y entrega a domicilio.</p></div><div><p className="font-bold text-white">Navegación</p><div className="mt-2 grid gap-1"><Link href="/productos">Productos</Link><Link href="/ofertas">Ofertas</Link><Link href="/sucursales">Sucursales</Link></div></div><div><p className="font-bold text-white">Administración</p><p className="mt-2">El inventario se gestiona desde el panel protegido de GestorIA.</p></div></div></footer>;
+  return <footer className="hidden border-t border-black/10 bg-brand-ink px-6 py-10 text-sm text-white/75 md:block"><div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3"><div><p className="text-lg font-extrabold text-white">Repuestos Mendez</p><p className="mt-2 max-w-xs">Productos publicados desde tu stock real, con pago online y entrega a domicilio.</p></div><div><p className="font-bold text-white">Navegación</p><div className="mt-2 grid gap-1"><Link href="/productos">Productos</Link><Link href="/ofertas">Ofertas</Link><Link href="/sucursales">Sucursales</Link></div></div><div><p className="font-bold text-white">Administración</p><p className="mt-2">Hecho por Nicolas Mendez.</p></div></div></footer>;
 }
 
 export function StoreSearchLink() {

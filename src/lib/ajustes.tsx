@@ -29,7 +29,7 @@ export const AJUSTES_DEFAULT: Ajustes = {
   teclasPago: { "1": "efectivo", "2": "qr", "3": "tarjeta" },
 };
 
-const KEY = "gestoria:ajustes";
+const KEY = "mendez:ajustes";
 
 let cache: Ajustes = AJUSTES_DEFAULT;
 let cargado = false;

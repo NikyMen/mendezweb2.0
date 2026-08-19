@@ -18,7 +18,7 @@ const EJEMPLOS = [
 
 // La conversación abierta se recuerda en el navegador: así volver desde otra
 // sección (o recargar) reabre el chat donde estaba, no uno vacío.
-const KEY_ACTIVA = "gestoria:ia:conv";
+const KEY_ACTIVA = "mendez:ia:conv";
 
 export function AsistenteIA({ inicial }: { inicial: ConversacionResumen[] }) {
   const [conversaciones, setConversaciones] = useState(inicial);

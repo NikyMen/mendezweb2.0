@@ -53,8 +53,8 @@ export function CajaPOS({ productos }: { productos: Producto[] }) {
   // Códigos que llegan de la cámara del nav inferior (mismo /caja, sin recargar)
   useEffect(() => {
     const onScan = (e: Event) => porCodigo((e as CustomEvent<string>).detail);
-    window.addEventListener("gestoria:scan", onScan);
-    return () => window.removeEventListener("gestoria:scan", onScan);
+    window.addEventListener("mendez:scan", onScan);
+    return () => window.removeEventListener("mendez:scan", onScan);
   }, [porCodigo]);
 
   // …o del query param, cuando se escaneó estando en otra sección.

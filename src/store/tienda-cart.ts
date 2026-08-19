@@ -54,6 +54,6 @@ export const useTiendaCart = create<CartState>()(
       count: () => get().lines.reduce((sum, line) => sum + line.qty, 0),
       total: () => get().lines.reduce((sum, line) => sum + line.qty * line.product.price, 0),
     }),
-    { name: "gestoria-tienda-cart" }
+    { name: "mendez-tienda-cart" }
   )
 );

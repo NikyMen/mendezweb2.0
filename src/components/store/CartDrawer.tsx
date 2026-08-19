@@ -15,7 +15,7 @@ import { useUI } from "@/store/ui";
 import { formatARS } from "@/lib/format";
 import type { CouponQuote } from "@/lib/types";
 
-const CHECKOUT_ATTEMPT_KEY = "gestoria-checkout-attempt";
+const CHECKOUT_ATTEMPT_KEY = "mendez-checkout-attempt";
 
 export function CartDrawer() {
   const open = useUI((s) => s.cartOpen);

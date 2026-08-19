@@ -13,8 +13,8 @@ import {
   type UsuarioActual,
 } from "@/lib/permisos";
 
-export const COOKIE = "gestoria_session";
-const SECRET = process.env.AUTH_SECRET || "gestoria-dev-secret-cambia-esto";
+export const COOKIE = "mendez_session";
+const SECRET = process.env.AUTH_SECRET || "repuestos-mendez-dev-secret-cambia-esto";
 
 // Credenciales del admin por entorno (respaldo/bootstrap del login DB)
 const USER = process.env.AUTH_USER || "admin";

@@ -1,4 +1,4 @@
-// Configuración de PM2 para GestorIA.
+// Configuración de PM2 para Repuestos Mendez.
 //
 // IMPORTANTE: Baileys (WhatsApp) corre dentro de este mismo proceso de Next.js
 // como singleton en globalThis. Por eso DEBE ser una sola instancia en modo
@@ -8,7 +8,7 @@
 module.exports = {
   apps: [
     {
-      name: "gestoria",
+      name: "repuestos-mendez",
       script: "node_modules/next/dist/bin/next",
       args: "start -p 3300",
       cwd: __dirname,

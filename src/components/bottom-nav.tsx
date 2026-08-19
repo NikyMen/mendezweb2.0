@@ -69,7 +69,7 @@ export function BottomNav({ usuario }: { usuario: UsuarioActual }) {
     if (path === "/admin/caja") {
       // El POS ya está montado con su carrito: le pasamos el código sin navegar
       // para no perder lo que hay cargado.
-      window.dispatchEvent(new CustomEvent("gestoria:scan", { detail: codigo }));
+      window.dispatchEvent(new CustomEvent("mendez:scan", { detail: codigo }));
     } else {
       router.push(`/admin/caja?scan=${encodeURIComponent(codigo)}`);
     }

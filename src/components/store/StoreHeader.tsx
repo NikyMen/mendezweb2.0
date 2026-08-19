@@ -34,7 +34,7 @@ export function StoreHeader() {
           <Menu size={24} />
         </button>
 
-        <Link href="/" aria-label="Inicio de la tienda Consultoría Digital">
+        <Link href="/" aria-label="Inicio de la tienda Repuestos Mendez">
           <Logo />
         </Link>
 

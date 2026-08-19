@@ -9,7 +9,7 @@ export function Footer() {
         <div>
           <Logo />
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">
-            Catálogo online con precios y disponibilidad actualizados desde GestorIA.
+            Catálogo online de Repuestos Mendez, con precios y disponibilidad actualizados.
           </p>
         </div>
         <div>
@@ -30,7 +30,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10 py-4 text-center text-xs text-white/45">
-        © {new Date().getFullYear()} Consultoría Digital · Tienda administrada con GestorIA
+        © {new Date().getFullYear()} Repuestos Mendez · Hecho por Nicolas Mendez
       </div>
     </footer>
   );

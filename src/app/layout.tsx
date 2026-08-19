@@ -14,9 +14,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "GestorIA — ERP con Inteligencia Artificial",
+  title: "Repuestos Mendez",
   description:
-    "Gestioná ventas, compras, stock, clientes y facturación. La IA transforma tus productos en contenido listo para vender.",
+    "Repuestos Mendez — repuestos con stock y precios actualizados. Hecho por Nicolas Mendez.",
   icons: { icon: "/brand/favicon.png" },
 };
 

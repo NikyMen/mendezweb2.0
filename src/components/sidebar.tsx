@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { logout } from "@/app/login/actions";
@@ -58,9 +57,10 @@ function SidebarContent({
   return (
     <>
       <div className="mb-8 px-2">
-        <Image src="/brand/logo-cd.webp" alt="Consultoría Digital" width={180} height={120} className="h-auto w-40" priority />
-        <p className="mt-3 text-xs font-semibold tracking-wide text-lime">GestorIA</p>
-        <p className="text-[11px] text-slate-500">ERP con Inteligencia Artificial</p>
+        <p className="text-xl font-extrabold uppercase leading-tight tracking-tight text-white">
+          Repuestos <span className="text-lime">Mendez</span>
+        </p>
+        <p className="mt-1 text-[11px] text-slate-500">Hecho por Nicolas Mendez</p>
       </div>
 
       <nav className="flex flex-col gap-1">
@@ -146,8 +146,9 @@ export function Sidebar({ usuario }: { usuario: UsuarioActual }) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <Image src="/brand/logo-cd.webp" alt="" width={90} height={60} className="h-6 w-auto" priority />
-        <span className="text-sm font-semibold tracking-wide text-lime">GestorIA</span>
+        <span className="text-sm font-extrabold uppercase tracking-tight text-white">
+          Repuestos <span className="text-lime">Mendez</span>
+        </span>
       </header>
 
       {/* Sidebar fijo en escritorio, con los rayos de luz de fondo */}

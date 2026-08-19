@@ -230,7 +230,7 @@ class WhatsAppManager extends EventEmitter {
           keys: makeCacheableSignalKeyStore(state.keys, logger),
         },
         logger,
-        browser: ["GestorIA", "Chrome", "120.0.0"],
+        browser: ["Repuestos Mendez", "Chrome", "120.0.0"],
         markOnlineOnConnect: false,
         syncFullHistory: false,
         generateHighQualityLinkPreview: false,
